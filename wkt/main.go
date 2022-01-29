@@ -24,6 +24,8 @@ type oldChinese struct {
 	Zheng   []string `json:"zh"`
 }
 
+var localWordCache = make(map[string]oldChinese)
+
 func ipaTrim(s string) string {
 	// /*myrealipa/ ---> myrealipa
 	return s[2 : len(s)-1]
@@ -32,6 +34,12 @@ func ipaTrim(s string) string {
 // getWordByWord scraps the content from Wiktionary
 func getWordByWord(c *gin.Context) {
 	word := c.Param("word")
+
+	cacheEntry, thereIs := localWordCache[word]
+	if thereIs {
+		c.JSON(http.StatusOK, cacheEntry)
+	}
+
 	wordStructure := oldChinese{
 		Version: "0.0.1",
 		Word:    word,
@@ -57,11 +65,11 @@ func getWordByWord(c *gin.Context) {
 	if err != nil {
 		wordStructure.Parse = false
 		c.JSON(http.StatusNotFound, wordStructure)
-		return
+	} else {
+		wordStructure.Parse = true
+		c.JSON(http.StatusOK, wordStructure)
 	}
-
-	wordStructure.Parse = true
-	c.JSON(http.StatusOK, wordStructure)
+	localWordCache[word] = wordStructure
 }
 
 func main() {
