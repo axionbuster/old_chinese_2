@@ -1,4 +1,4 @@
-module example/web-service-gin
+module axionbuster/go-wkt
 
 go 1.17
 
