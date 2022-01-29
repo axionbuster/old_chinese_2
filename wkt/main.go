@@ -5,9 +5,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
-)
 
-import (
 	"github.com/gin-gonic/gin"
 	"github.com/gocolly/colly/v2"
 )
@@ -65,15 +63,12 @@ func commonLookup(word string) oldChinese {
 		case "BaxterSagart":
 			rawIPA := ipaTrim(e.ChildText("span.IPAchar"))
 			wordStructure.Baxter = append(wordStructure.Baxter, rawIPA)
-			break
 		case "Zhengzhang":
 			rawIPA := ipaTrim(e.ChildText("span.IPAchar"))
 			wordStructure.Zheng = append(wordStructure.Zheng, rawIPA)
-			break
 		}
 	})
 
-	// Visit
 	err := co.Visit(fmt.Sprintf("https://en.wiktionary.org/wiki/%s", word))
 	wordStructure.Parse = err == nil
 	localWordCache[word] = wordStructure
