@@ -1,14 +1,16 @@
 import Head from 'next/head'
 import Link from 'next/link'
-import {useState} from "react"
+import {useState, useEffect} from "react"
 import {useRouter} from "next/router"
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faExternalLinkAlt} from "@fortawesome/free-solid-svg-icons/faExternalLinkAlt";
 
-export default function Home({connection}) {
+const defaultText = "子曰：「學而時習之，不亦說乎？有朋自遠方來，不亦樂乎？人不知而不慍，不亦君子乎？」";
+
+export default function Home({connection, orig}) {
     const router = useRouter();
 
-    const [formText, setFormText] = useState("子曰：「學而時習之，不亦說乎？有朋自遠方來，不亦樂乎？人不知而不慍，不亦君子乎？」");
+    const [formText, setFormText] = useState(defaultText);
 
     async function onSubmit() {
         await router.push(`/?t=${formText}`)
@@ -17,6 +19,10 @@ export default function Home({connection}) {
     async function onTextInput(e) {
         setFormText(e.target.value)
     }
+
+    useEffect(() => {
+        setFormText(orig ? orig : defaultText)
+    }, [orig])
 
     return (
         <div className={`flex flex-col items-center justify-center my-5 md:my-20 mx-4`}>
@@ -45,16 +51,23 @@ export default function Home({connection}) {
                         <span className={`border-b-2 border-black`}>Submit</span>
                     </button>
                 </form>
-                <p>
-                    IPA (Zhengzhang; Wiktionary):
-                    <br/>
-                    {
-                        typeof connection === "undefined" ||
-                        !connection.hasOwnProperty("result") ||
-                        connection.result === ""
-                            ? "Not provided." : connection.result
-                    }
-                </p>
+                <p>IPA (Zhengzhang; Wiktionary):</p>
+                <div className={`text-left my-4`}>
+                    <p>
+                        {
+                            typeof connection === "undefined" ||
+                            !connection.hasOwnProperty("result") ||
+                            connection.result === ""
+                                ? "Not provided." : connection.result
+                        }
+                    </p>
+                    <p className={`italic font-light text-sm text-gray-700`}>
+                        {
+                            typeof orig === "undefined" ||
+                            orig === ""
+                                ? "Unknown input." : orig
+                        }
+                    </p></div>
             </div>
         </div>
     )
@@ -69,13 +82,15 @@ export async function getServerSideProps(context) {
         })
         return {
             props: {
-                connection: js
+                connection: js,
+                orig: t,
             }
         }
     } catch (e) {
         return {
             props: {
-                connection: {}
+                connection: {},
+                orig: t,
             }
         }
     }
