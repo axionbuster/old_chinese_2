@@ -61,11 +61,19 @@ func commonLookup(word string) oldChinese {
 
 		switch whichIPA {
 		case "BaxterSagart":
-			rawIPA := ipaTrim(e.ChildText("span.IPAchar"))
-			wordStructure.Baxter = append(wordStructure.Baxter, rawIPA)
+			rawIPA := e.ChildText("span.IPAchar")
+			IPAsplit := strings.Split(rawIPA, ",")
+			for i, ipa := range IPAsplit {
+				IPAsplit[i] = ipaTrim(ipa)
+			}
+			wordStructure.Baxter = append(wordStructure.Baxter, IPAsplit...)
 		case "Zhengzhang":
-			rawIPA := ipaTrim(e.ChildText("span.IPAchar"))
-			wordStructure.Zheng = append(wordStructure.Zheng, rawIPA)
+			rawIPA := e.ChildText("span.IPAchar")
+			IPAsplit := strings.Split(rawIPA, ",")
+			for i, ipa := range IPAsplit {
+				IPAsplit[i] = ipaTrim(ipa)
+			}
+			wordStructure.Zheng = append(wordStructure.Zheng, IPAsplit...)
 		}
 	})
 
@@ -136,7 +144,7 @@ func main() {
 	router.GET("/w/:word", getWordByWord)
 	router.GET("/t/:text", getText)
 
-	err := router.Run("localhost:8080")
+	err := router.Run("0.0.0.0:8080")
 	if err != nil {
 		_, err := fmt.Fprintf(os.Stderr, "There was an error with Gin.\n")
 		if err != nil {
