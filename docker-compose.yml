@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  fro:
+    build: fro
+    ports:
+      - "3000:3000"
+  wkt:
+    build: wkt
+    expose: # not necessary
+      - "8080"
